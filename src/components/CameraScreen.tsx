@@ -310,64 +310,74 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
             </div>
           </div>
 
-          {/* Thumbnail strip preview */}
-          {photos.length > 0 && (
+          {/* Reserve preview space so each captured thumbnail doesn't recenter the whole screen. */}
+          <div className="flex items-center justify-center min-h-19 mb-5">
             <motion.div
-              className="flex gap-2 mb-5"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="flex gap-2"
+              initial={false}
+              animate={{ opacity: photos.length > 0 ? 1 : 0.55 }}
             >
-              {photos.map((p, i) => (
-                <div key={i} className="w-14 h-14 rounded-lg overflow-hidden ring-1 ring-border">
-                  <img src={p} alt="" className="w-full h-full object-cover" style={{ transform: "scaleX(-1)" }} />
-                </div>
-              ))}
-              {[...Array(3 - photos.length)].map((_, i) => (
-                <div key={i} className="w-14 h-14 rounded-lg bg-muted ring-1 ring-border" />
-              ))}
-            </motion.div>
-          )}
+              {[0, 1, 2].map((i) => {
+                const photo = photos[i];
 
-          {/* Start / status */}
-          <AnimatePresence mode="wait">
-            {phase === "ready" ? (
-              <motion.button
-                key="start"
-                onClick={runSequence}
-                className="px-10 py-3.5 rounded-full font-sans text-sm font-medium tracking-wide text-white"
-                style={{
-                  background: "linear-gradient(135deg, hsl(352 35% 72%), hsl(352 30% 66%))",
-                  boxShadow: "0 4px 14px rgba(210, 130, 125, 0.35)",
-                }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                start the shoot
-              </motion.button>
-            ) : phase === "countdown" ? (
-              <motion.div
-                key="shooting"
-                className="text-sm font-sans text-muted-foreground"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                get ready! 📷
-              </motion.div>
-            ) : phase === "preview" ? (
-              <motion.div
-                key="done"
-                className="text-sm font-sans text-muted-foreground"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                developing your fotos...
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+                return photo ? (
+                  <motion.div
+                    key={i}
+                    className="w-14 h-14 rounded-lg overflow-hidden ring-1 ring-border"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <img src={photo} alt="" className="w-full h-full object-cover" style={{ transform: "scaleX(-1)" }} />
+                  </motion.div>
+                ) : (
+                  <div key={i} className="w-14 h-14 rounded-lg bg-muted ring-1 ring-border" />
+                );
+              })}
+            </motion.div>
+          </div>
+
+          {/* Reserve status space so phase changes don't nudge the camera view. */}
+          <div className="flex items-center justify-center min-h-14">
+            <AnimatePresence mode="wait">
+              {phase === "ready" ? (
+                <motion.button
+                  key="start"
+                  onClick={runSequence}
+                  className="px-10 py-3.5 rounded-full font-sans text-sm font-medium tracking-wide text-white"
+                  style={{
+                    background: "linear-gradient(135deg, hsl(352 35% 72%), hsl(352 30% 66%))",
+                    boxShadow: "0 4px 14px rgba(210, 130, 125, 0.35)",
+                  }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  start the shoot
+                </motion.button>
+              ) : phase === "countdown" ? (
+                <motion.div
+                  key="shooting"
+                  className="text-sm font-sans text-muted-foreground"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  get ready! 📷
+                </motion.div>
+              ) : phase === "preview" ? (
+                <motion.div
+                  key="done"
+                  className="text-sm font-sans text-muted-foreground"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  developing your fotos...
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
 
           {phase === "ready" && (
             <button

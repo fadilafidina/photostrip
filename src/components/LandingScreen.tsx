@@ -34,9 +34,9 @@ export default function LandingScreen({ onStart }: Props) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <div className="text-xs font-sans font-light tracking-[0.3em] text-muted-foreground uppercase mb-3">
+        {/* <div className="text-xs font-sans font-light tracking-[0.3em] text-muted-foreground uppercase mb-3">
         ⋆𐙚₊˚⊹♡
-        </div>
+        </div> */}
         <h1
           className="font-display text-6xl md:text-7xl text-foreground leading-none mb-2"
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 400 }}
@@ -111,7 +111,7 @@ export default function LandingScreen({ onStart }: Props) {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.0, duration: 0.5 }}
       >
-      ⋆˙⟡ made with ♡ by dila • <a href="https://github.com/fadilafidina/photostrip">github</a> ⟡˙⋆
+      ⋆˙⟡ made with ♡ by dila • <a href="https://github.com/fadilafidina/photostrip">gh</a> ⟡˙⋆
       </motion.p>
     </motion.div>
   );
