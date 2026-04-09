@@ -8,25 +8,16 @@ interface Props {
 
 const COZY_EMOJIS = ["🩷", "🦢", "🫧", "🪞", "☁️", "🌸", "🎀", "✨", "🕯️", "🧸", "🤍", "💌"];
 
-// Fixed border positions as [left%, top%] — arranged around the perimeter
-const BORDER_SLOTS: [number, number, number][] = [
-  // top edge
-  [8,   -5,  -12],
-  [28,  -4,    8],
-  [50,  -5,    3],
-  [71,  -4,  -10],
-  [90,  -5,   14],
-  // right edge
-  [97,  20,  -15],
-  [97,  55,    8],
-  [97,  80,  -10],
-  // bottom edge
-  [78, 102,   10],
-  [52, 103,   -8],
-  [28, 102,   12],
-  // left edge
-  [ 1,  65,   -8],
-];
+type BorderEmoji = {
+  emoji: string;
+  left: number;
+  top: number;
+  rotate: number;
+};
+
+function randomRange(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -35,6 +26,58 @@ function shuffle<T>(arr: T[]): T[] {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+function generateBorderEmojis(): BorderEmoji[] {
+  const shuffled = shuffle(COZY_EMOJIS);
+  const placements: Omit<BorderEmoji, "emoji">[] = [];
+  const edges = [
+    { edge: "top", count: 4, start: 3, end: 97 },
+    { edge: "right", count: 3, start: 8, end: 92 },
+    { edge: "bottom", count: 3, start: 4, end: 96 },
+    { edge: "left", count: 3, start: 10, end: 90 },
+  ] as const;
+
+  edges.forEach(({ edge, count, start, end }) => {
+    const span = end - start;
+
+    for (let i = 0; i < count; i++) {
+      const anchor = start + ((i + 1) * span) / (count + 1);
+      const alongEdge = anchor + randomRange(-3.5, 3.5);
+      const outsideOffset = randomRange(1.2, 3.2);
+
+      if (edge === "top") {
+        placements.push({
+          left: alongEdge,
+          top: -outsideOffset,
+          rotate: randomRange(-18, 18),
+        });
+      } else if (edge === "right") {
+        placements.push({
+          left: 100 + outsideOffset,
+          top: alongEdge,
+          rotate: randomRange(-22, 22),
+        });
+      } else if (edge === "bottom") {
+        placements.push({
+          left: alongEdge,
+          top: 100 + outsideOffset,
+          rotate: randomRange(-18, 18),
+        });
+      } else {
+        placements.push({
+          left: -outsideOffset,
+          top: alongEdge,
+          rotate: randomRange(-22, 22),
+        });
+      }
+    }
+  });
+
+  return placements.map((placement, index) => ({
+    emoji: shuffled[index % shuffled.length],
+    ...placement,
+  }));
 }
 
 export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
@@ -49,16 +92,8 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
   const [error, setError] = useState<string | null>(null);
   const photosRef = useRef<string[]>([]);
 
-  // Stable randomised emoji assignments for each border slot
-  const borderEmojis = useMemo(() => {
-    const shuffled = shuffle(COZY_EMOJIS);
-    return BORDER_SLOTS.map((slot, i) => ({
-      emoji: shuffled[i % shuffled.length],
-      left: slot[0],
-      top: slot[1],
-      rotate: slot[2],
-    }));
-  }, []);
+  // Stable edge distribution with light jitter so the layout feels balanced but not rigid.
+  const borderEmojis = useMemo(() => generateBorderEmojis(), []);
 
   useEffect(() => {
     async function startCamera() {
