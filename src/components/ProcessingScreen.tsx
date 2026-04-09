@@ -58,10 +58,10 @@ export default function ProcessingScreen({ onDone }: Props) {
         animate={{ opacity: [0.7, 1, 0.7] }}
         transition={{ repeat: Infinity, duration: 1.4 }}
       >
-        developing your fotos...
+        developing your fotos
       </motion.p>
       <p className="font-sans text-xs text-muted-foreground tracking-widest uppercase">
-        just a moment…
+        just a moment
       </p>
     </motion.div>
   );

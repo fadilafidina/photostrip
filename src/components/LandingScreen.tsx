@@ -111,7 +111,7 @@ export default function LandingScreen({ onStart }: Props) {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.0, duration: 0.5 }}
       >
-        made with ᡣ𐭩 by dila • <a href="https://github.com/fadilafidina/photostrip">💻</a>
+      ⋆˙⟡ made with ♡ by dila • <a href="https://github.com/fadilafidina/photostrip">github</a> ⟡˙⋆
       </motion.p>
     </motion.div>
   );
