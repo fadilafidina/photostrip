@@ -101,8 +101,8 @@ export default function EditorScreen({ photos, onReset }: Props) {
         >
           {/* Background */}
           <div>
-            <p className="font-sans text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
-              Background
+            <p className="font-sans text-xs font-medium tracking-widest text-muted-foreground mb-3">
+              background
             </p>
             <div className="flex flex-wrap gap-2">
               {BACKGROUND_COLORS.map((c) => (
@@ -128,8 +128,8 @@ export default function EditorScreen({ photos, onReset }: Props) {
 
           {/* Stickers */}
           <div>
-            <p className="font-sans text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
-              Stickers
+            <p className="font-sans text-xs font-medium tracking-widest text-muted-foreground mb-3">
+              stickers
             </p>
             <div className="flex flex-wrap gap-2">
               {STICKERS.map((emoji) => (
@@ -150,7 +150,7 @@ export default function EditorScreen({ photos, onReset }: Props) {
                 onClick={() => setStickers([])}
                 className="mt-2 text-xs text-muted-foreground/50 underline underline-offset-4 font-sans"
               >
-                Clear all
+                clear all
               </button>
             )}
           </div>
@@ -159,14 +159,14 @@ export default function EditorScreen({ photos, onReset }: Props) {
 
           {/* Speech bubbles */}
           <div>
-            <p className="font-sans text-xs font-medium tracking-widest uppercase text-muted-foreground mb-3">
-              Speech bubble
+            <p className="font-sans text-xs font-medium tracking-widest text-muted-foreground mb-3">
+              speech bubble
             </p>
             <div className="flex gap-1.5">
               <input
                 ref={bubbleInputRef}
                 type="text"
-                placeholder="Type something…"
+                placeholder="type something…"
                 value={bubbleInput}
                 onChange={(e) => setBubbleInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") addBubble(); }}
@@ -184,7 +184,7 @@ export default function EditorScreen({ photos, onReset }: Props) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Add
+                add
               </motion.button>
             </div>
 
@@ -224,7 +224,7 @@ export default function EditorScreen({ photos, onReset }: Props) {
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
             >
-              {exporting ? "Saving…" : "Save strip"}
+              {exporting ? "saving…" : "save strip"}
               <AnimatePresence>
                 {sparkle && (
                   <motion.span
@@ -244,12 +244,12 @@ export default function EditorScreen({ photos, onReset }: Props) {
               onClick={onReset}
               className="text-xs text-muted-foreground/50 underline underline-offset-4 font-sans text-center"
             >
-              Start over
+              start over
             </button>
           </div>
 
           <p className="text-[10px] text-muted-foreground/40 font-sans text-center italic leading-relaxed">
-            Drag to reposition · Double-click to remove
+            drag to reposition · double-click to remove
           </p>
         </motion.div>
       </div>

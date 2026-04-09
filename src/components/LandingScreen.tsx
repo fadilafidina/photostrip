@@ -35,13 +35,13 @@ export default function LandingScreen({ onStart }: Props) {
         transition={{ delay: 0.3, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
         <div className="text-xs font-sans font-light tracking-[0.3em] text-muted-foreground uppercase mb-3">
-          a moment worth keeping
+        ⋆𐙚₊˚⊹♡
         </div>
         <h1
           className="font-display text-6xl md:text-7xl text-foreground leading-none mb-2"
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 400 }}
         >
-          Photostrip
+          fotostrip
         </h1>
         <div
           className="font-display text-xl text-muted-foreground italic mb-10"
@@ -85,7 +85,7 @@ export default function LandingScreen({ onStart }: Props) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.65, duration: 0.5 }}
       >
-        Three photos. One strip. A memory you'll want to keep forever.
+        {`a fun lil fotobooth for you and your friends <3`}
       </motion.p>
 
       {/* CTA button */}
@@ -102,7 +102,7 @@ export default function LandingScreen({ onStart }: Props) {
         whileHover={{ scale: 1.04, boxShadow: "0 6px 18px rgba(210, 130, 125, 0.45)" }}
         whileTap={{ scale: 0.97 }}
       >
-        Open the booth
+        open the booth
       </motion.button>
 
       <motion.p
@@ -111,7 +111,7 @@ export default function LandingScreen({ onStart }: Props) {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.0, duration: 0.5 }}
       >
-        No sign-up required · Works on mobile
+        made with ᡣ𐭩 by dila • <a href="https://github.com/fadilafidina/photostrip">💻</a>
       </motion.p>
     </motion.div>
   );

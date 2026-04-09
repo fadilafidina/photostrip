@@ -276,7 +276,7 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
                 <div className="absolute top-3 left-0 right-0 flex justify-center z-20">
                   <div className="bg-black/20 backdrop-blur-sm rounded-full px-3 py-1">
                     <span className="text-white text-xs font-sans">
-                      Photo {currentShot + 1} of 3
+                      foto {currentShot + 1} of 3
                     </span>
                   </div>
                 </div>
@@ -345,7 +345,7 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
               >
-                Start the shoot
+                start the shoot
               </motion.button>
             ) : phase === "countdown" ? (
               <motion.div
@@ -355,7 +355,7 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                Get ready! 📷
+                get ready! 📷
               </motion.div>
             ) : phase === "preview" ? (
               <motion.div
@@ -364,7 +364,7 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
-                Developing your strip…
+                developing your fotos...
               </motion.div>
             ) : null}
           </AnimatePresence>
@@ -374,7 +374,7 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
               onClick={onBack}
               className="mt-4 text-xs text-muted-foreground/60 underline underline-offset-4 font-sans"
             >
-              Back
+              back
             </button>
           )}
         </>
