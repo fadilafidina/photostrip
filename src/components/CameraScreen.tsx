@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useIsKidcore } from "@/lib/theme";
+import { INK, KC, KIDCORE_STICKERS, StickerGlyph } from "./kidcore/doodles";
 
 interface Props {
   onPhotosCapture: (photos: string[]) => void;
@@ -28,8 +30,8 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function generateBorderEmojis(): BorderEmoji[] {
-  const shuffled = shuffle(COZY_EMOJIS);
+function generateBorderEmojis(pool: string[]): BorderEmoji[] {
+  const shuffled = shuffle(pool);
   const placements: Omit<BorderEmoji, "emoji">[] = [];
   const edges = [
     { edge: "top", count: 4, start: 3, end: 97 },
@@ -93,7 +95,8 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
   const photosRef = useRef<string[]>([]);
 
   // Stable edge distribution with light jitter so the layout feels balanced but not rigid.
-  const borderEmojis = useMemo(() => generateBorderEmojis(), []);
+  const kid = useIsKidcore();
+  const borderEmojis = useMemo(() => generateBorderEmojis(kid ? KIDCORE_STICKERS : COZY_EMOJIS), [kid]);
 
   useEffect(() => {
     async function startCamera() {
@@ -231,17 +234,20 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
                     transition={{ duration: 0.25, ease: "easeOut" }}
                   >
                     <div
-                      className="bg-white/25 backdrop-blur-sm rounded-full flex items-center justify-center"
-                      style={{ width: 80, height: 80 }}
+                      className={kid ? "rounded-full flex items-center justify-center" : "bg-white/25 backdrop-blur-sm rounded-full flex items-center justify-center"}
+                      style={kid
+                        ? { width: 92, height: 92, background: KC.yellow, border: `3px solid ${INK}`, boxShadow: `4px 5px 0 ${INK}` }
+                        : { width: 80, height: 80 }}
                     >
                       <span
                         style={{
-                          fontFamily: "'Inter', system-ui, sans-serif",
-                          fontSize: 42,
-                          fontWeight: 600,
-                          color: "#fff",
+                          fontFamily: kid ? "'Lilita One', sans-serif" : "'Inter', system-ui, sans-serif",
+                          fontSize: kid ? 54 : 42,
+                          fontWeight: kid ? 400 : 600,
+                          color: kid ? KC.red : "#fff",
                           lineHeight: 1,
-                          textShadow: "0 2px 12px rgba(0,0,0,0.28)",
+                          textShadow: kid ? `2px 3px 0 ${INK}` : "0 2px 12px rgba(0,0,0,0.28)",
+                          WebkitTextStroke: kid ? `2px ${INK}` : undefined,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -274,8 +280,11 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
               {/* Shot label */}
               {phase === "countdown" && (
                 <div className="absolute top-3 left-0 right-0 flex justify-center z-20">
-                  <div className="bg-black/20 backdrop-blur-sm rounded-full px-3 py-1">
-                    <span className="text-white text-xs font-sans">
+                  <div
+                    className={kid ? "rounded-full px-3 py-0.5 bg-white border-2" : "bg-black/20 backdrop-blur-sm rounded-full px-3 py-1"}
+                    style={kid ? { borderColor: INK, boxShadow: `2px 2px 0 ${INK}` } : undefined}
+                  >
+                    <span className={kid ? "font-hand text-base font-bold" : "text-white text-xs font-sans"} style={kid ? { color: INK } : undefined}>
                       foto {currentShot + 1} of 3
                     </span>
                   </div>
@@ -298,13 +307,13 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
                     fontSize: "22px",
                     lineHeight: 1,
                     transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
-                    filter: "drop-shadow(0 1px 4px rgba(0,0,0,0.13))",
+                    filter: kid ? undefined : "drop-shadow(0 1px 4px rgba(0,0,0,0.13))",
                   }}
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.04 * i, type: "spring", stiffness: 340, damping: 18 }}
                 >
-                  {emoji}
+                  <StickerGlyph id={emoji} size={kid ? 30 : 22} />
                 </motion.span>
               ))}
             </div>
@@ -323,14 +332,14 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
                 return photo ? (
                   <motion.div
                     key={i}
-                    className="w-14 h-14 rounded-lg overflow-hidden ring-1 ring-border"
+                    className={`w-14 h-14 rounded-lg overflow-hidden ${kid ? "border-2 border-foreground" : "ring-1 ring-border"}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
                     <img src={photo} alt="" className="w-full h-full object-cover" style={{ transform: "scaleX(-1)" }} />
                   </motion.div>
                 ) : (
-                  <div key={i} className="w-14 h-14 rounded-lg bg-muted ring-1 ring-border" />
+                  <div key={i} className={`w-14 h-14 rounded-lg bg-muted ${kid ? "border-2 border-dashed border-foreground/40" : "ring-1 ring-border"}`} />
                 );
               })}
             </motion.div>
@@ -343,23 +352,23 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
                 <motion.button
                   key="start"
                   onClick={runSequence}
-                  className="px-10 py-3.5 rounded-full font-sans text-sm font-medium tracking-wide text-white"
-                  style={{
+                  className={kid ? "kc-btn px-10 py-3.5 rounded-full text-lg" : "px-10 py-3.5 rounded-full font-sans text-sm font-medium tracking-wide text-white"}
+                  style={kid ? undefined : {
                     background: "linear-gradient(135deg, hsl(352 35% 72%), hsl(352 30% 66%))",
                     boxShadow: "0 4px 14px rgba(210, 130, 125, 0.35)",
                   }}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  whileHover={{ scale: 1.04 }}
+                  whileHover={{ scale: kid ? 1 : 1.04 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  start the shoot
+                  {kid ? "start the shoot!" : "start the shoot"}
                 </motion.button>
               ) : phase === "countdown" ? (
                 <motion.div
                   key="shooting"
-                  className="text-sm font-sans text-muted-foreground"
+                  className={kid ? "font-hand text-xl font-bold text-foreground" : "text-sm font-sans text-muted-foreground"}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -369,7 +378,7 @@ export default function CameraScreen({ onPhotosCapture, onBack }: Props) {
               ) : phase === "preview" ? (
                 <motion.div
                   key="done"
-                  className="text-sm font-sans text-muted-foreground"
+                  className={kid ? "font-hand text-xl font-bold text-foreground" : "text-sm font-sans text-muted-foreground"}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >

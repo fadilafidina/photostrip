@@ -1,3 +1,6 @@
+import { doodleImageSrc, isDoodle, INK } from "@/components/kidcore/doodles";
+import type { Theme } from "@/lib/theme";
+
 export interface Sticker {
   id: string;
   emoji: string;
@@ -115,7 +118,9 @@ export async function exportStrip(
   backgroundColor: string,
   stickers: Sticker[],
   bubbles: TextBubble[],
+  theme: Theme = "classic",
 ): Promise<void> {
+  const kid = theme === "kidcore";
   const SCALE = 3;
   const W = STRIP.WIDTH * SCALE;
   const H = STRIP.HEIGHT * SCALE;
@@ -146,14 +151,39 @@ export async function exportStrip(
     ctx.clip();
     ctx.drawImage(img, x, y, PW, PH);
     ctx.restore();
+    if (kid) {
+      // ink outline inside the photo edge (matches the preview's inset outline)
+      ctx.save();
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 2 * SCALE;
+      roundRect(ctx, x + SCALE, y + SCALE, PW - 2 * SCALE, PH - 2 * SCALE, 5 * SCALE);
+      ctx.stroke();
+      ctx.restore();
+    }
   });
 
   // Scale from preview coords to export coords
   const sx = W / STRIP.WIDTH;
   const sy = H / STRIP.HEIGHT;
 
-  // Stickers — rendered as text (best emoji quality in canvas)
+  // Doodle stickers are SVGs (with their own die-cut border) drawn as images
+  const doodleImgs = new Map<string, HTMLImageElement>();
+  await Promise.all(
+    stickers
+      .filter((s) => isDoodle(s.emoji))
+      .map(async (s) => {
+        const px = Math.round(28 * s.scale * 1.25 * SCALE);
+        doodleImgs.set(s.id, await loadImage(await doodleImageSrc(s.emoji, px)));
+      }),
+  );
+
+  // Stickers — emoji rendered as text (best emoji quality in canvas)
   stickers.forEach((s) => {
+    const doodle = doodleImgs.get(s.id);
+    if (doodle) {
+      ctx.drawImage(doodle, s.x * sx - doodle.width / 2, s.y * sy - doodle.height / 2);
+      return;
+    }
     ctx.save();
     ctx.font = `${28 * s.scale * SCALE}px serif`;
     ctx.textAlign = "center";
@@ -180,7 +210,10 @@ export async function exportStrip(
     const tailH = 6 * SCALE;
     const br = 8 * SCALE;
 
-    ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    const bubbleFont = kid
+      ? `700 ${fontSize}px Nunito, ui-rounded, system-ui, sans-serif`
+      : `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.font = bubbleFont;
     ctx.textAlign = "left";
 
     // Measure text, respecting maxWidth
@@ -194,27 +227,63 @@ export async function exportStrip(
     const bLeft = bx - bw / 2;
     const bTop = by - bh - tailH;
 
-    // Shadow + white bubble body
-    ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.15)";
-    ctx.shadowBlur = 8 * SCALE;
-    ctx.shadowOffsetY = 2 * SCALE;
-    ctx.fillStyle = "#ffffff";
-    roundRect(ctx, bLeft, bTop, bw, bh, br);
-    ctx.fill();
+    if (kid) {
+      // Kidcore: white body + tail as one ink-outlined shape with a hard offset shadow
+      const tracePath = () => {
+        const r = br;
+        ctx.beginPath();
+        ctx.moveTo(bLeft + r, bTop);
+        ctx.lineTo(bLeft + bw - r, bTop);
+        ctx.quadraticCurveTo(bLeft + bw, bTop, bLeft + bw, bTop + r);
+        ctx.lineTo(bLeft + bw, bTop + bh - r);
+        ctx.quadraticCurveTo(bLeft + bw, bTop + bh, bLeft + bw - r, bTop + bh);
+        ctx.lineTo(bx + 5 * SCALE, bTop + bh);
+        ctx.lineTo(bx, by);
+        ctx.lineTo(bx - 5 * SCALE, bTop + bh);
+        ctx.lineTo(bLeft + r, bTop + bh);
+        ctx.quadraticCurveTo(bLeft, bTop + bh, bLeft, bTop + bh - r);
+        ctx.lineTo(bLeft, bTop + r);
+        ctx.quadraticCurveTo(bLeft, bTop, bLeft + r, bTop);
+        ctx.closePath();
+      };
+      ctx.save();
+      ctx.translate(2 * SCALE, 2 * SCALE);
+      ctx.fillStyle = INK;
+      tracePath();
+      ctx.fill();
+      ctx.restore();
+      ctx.save();
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 2 * SCALE;
+      ctx.lineJoin = "round";
+      tracePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    } else {
+      // Shadow + white bubble body
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.15)";
+      ctx.shadowBlur = 8 * SCALE;
+      ctx.shadowOffsetY = 2 * SCALE;
+      ctx.fillStyle = "#ffffff";
+      roundRect(ctx, bLeft, bTop, bw, bh, br);
+      ctx.fill();
 
-    // Tail
-    ctx.beginPath();
-    ctx.moveTo(bx - 5 * SCALE, by - tailH);
-    ctx.lineTo(bx, by);
-    ctx.lineTo(bx + 5 * SCALE, by - tailH);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
+      // Tail
+      ctx.beginPath();
+      ctx.moveTo(bx - 5 * SCALE, by - tailH);
+      ctx.lineTo(bx, by);
+      ctx.lineTo(bx + 5 * SCALE, by - tailH);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
 
     // Text centred inside bubble
-    ctx.fillStyle = "#2F2F2F";
-    ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.fillStyle = kid ? INK : "#2F2F2F";
+    ctx.font = bubbleFont;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(b.text, bx, bTop + bh / 2, maxTW);
@@ -222,6 +291,16 @@ export async function exportStrip(
 
   // Grain
   addGrain(ctx, W, H);
+
+  if (kid) {
+    // chunky ink border around the whole strip
+    ctx.save();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 4 * SCALE;
+    roundRect(ctx, 2 * SCALE, 2 * SCALE, W - 4 * SCALE, H - 4 * SCALE, 14 * SCALE);
+    ctx.stroke();
+    ctx.restore();
+  }
 
   canvas.toBlob((blob) => {
     if (!blob) return;

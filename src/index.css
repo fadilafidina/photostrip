@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Lilita+One&family=Gaegu:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -226,6 +226,138 @@
 }
 .sparkle {
   animation: sparkle 0.5s ease-out forwards;
+}
+
+
+/* ───────────────────────── Kidcore theme (/kidcore) ─────────────────────────
+   Everything below only applies under .theme-kidcore (set on <html> by App),
+   so the classic look at / is untouched. */
+.theme-kidcore {
+  /* Retro kidcore: old-paper cream + crayon-box primaries + ink outlines */
+  --background: 41 66% 90%;
+  --foreground: 18 18% 15%;
+  --border: 18 18% 15%;
+  --input: 18 18% 15%;
+  --ring: 212 52% 51%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 18 18% 15%;
+  --card-border: 18 18% 15%;
+
+  --sidebar: 41 66% 92%;
+  --sidebar-foreground: 18 18% 15%;
+  --sidebar-border: 18 18% 15%;
+  --sidebar-primary: 8 72% 56%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 41 55% 84%;
+  --sidebar-accent-foreground: 18 18% 15%;
+  --sidebar-ring: 212 52% 51%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 18 18% 15%;
+  --popover-border: 18 18% 15%;
+
+  /* Cherry red as primary */
+  --primary: 8 72% 56%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 42 88% 62%;
+  --secondary-foreground: 18 18% 15%;
+
+  --muted: 41 50% 84%;
+  --muted-foreground: 18 12% 36%;
+
+  --accent: 212 52% 51%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 75% 52%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* crayon box */
+  --kc-red: #E0533D;
+  --kc-orange: #EE8B2F;
+  --kc-yellow: #F4C04A;
+  --kc-green: #5DAA68;
+  --kc-blue: #3F7DC4;
+  --kc-purple: #8A6BB8;
+  --kc-pink: #F39BB8;
+  --kc-ink: #2E2420;
+  --kc-paper: #F7ECD4;
+
+  --chart-1: 8 72% 56%;
+  --chart-2: 42 88% 62%;
+  --chart-3: 128 30% 52%;
+  --chart-4: 212 52% 51%;
+  --chart-5: 264 33% 57%;
+
+  --app-font-sans: 'Nunito', ui-rounded, system-ui, sans-serif;
+  --app-font-serif: 'Lilita One', 'Nunito', sans-serif;
+  --app-font-mono: Menlo, monospace;
+  --app-font-hand: 'Gaegu', 'Comic Sans MS', cursive;
+  --radius: 1rem;
+}
+
+.theme-kidcore body {
+  font-family: var(--app-font-sans);
+}
+
+.theme-kidcore .font-display {
+  font-family: 'Lilita One', 'Nunito', sans-serif;
+}
+
+.font-hand {
+  font-family: var(--app-font-hand);
+}
+
+/* Old construction-paper: warm cream, mottled fibers, faint halftone */
+.kc-paper {
+  background-color: var(--kc-paper);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.42 0 0 0 0 0.25 0 0 0 0.16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
+    radial-gradient(circle, rgba(46, 36, 32, 0.07) 1px, transparent 1.4px);
+  background-size: 320px 320px, 14px 14px;
+}
+
+/* Lines that look printed/drawn by hand rather than vector-perfect */
+.kc-wobble {
+  filter: url(#kc-wobble);
+}
+
+/* Die-cut sticker: white border, slightly faded, soft offset shadow */
+.kc-sticker {
+  filter:
+    url(#kc-wobble)
+    drop-shadow(2.5px 0 0 #fffaf0) drop-shadow(-2.5px 0 0 #fffaf0)
+    drop-shadow(0 2.5px 0 #fffaf0) drop-shadow(0 -2.5px 0 #fffaf0)
+    drop-shadow(2px 3px 0 rgba(46, 36, 32, 0.45))
+    saturate(0.92);
+}
+
+/* Chunky primary button */
+.kc-btn {
+  font-family: 'Lilita One', 'Nunito', sans-serif;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: var(--kc-red);
+  border: 3px solid var(--kc-ink);
+  box-shadow: 4px 5px 0 var(--kc-ink);
+  transition: box-shadow 0.12s ease, transform 0.12s ease;
+}
+.kc-btn:active { box-shadow: 1px 1px 0 var(--kc-ink); }
+.kc-btn:disabled { box-shadow: 2px 2px 0 var(--kc-ink); }
+
+.theme-kidcore .camera-frame {
+  border: 3px solid var(--kc-ink);
+  box-shadow: 5px 6px 0 var(--kc-ink);
+}
+
+.theme-kidcore .strip-shadow {
+  border: 3px solid var(--kc-ink);
+  box-shadow: 5px 6px 0 var(--kc-ink);
+}
+
+.theme-kidcore .grain-overlay {
+  opacity: 0.06;
 }
 
 @layer utilities {

@@ -2,6 +2,8 @@ import { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import type { Sticker, TextBubble } from "@/lib/photostrip";
 import { STRIP } from "@/lib/photostrip";
+import { useIsKidcore } from "@/lib/theme";
+import { INK, StickerGlyph } from "./kidcore/doodles";
 
 interface Props {
   photos: string[];
@@ -26,6 +28,7 @@ export default function PhotostripPreview({
   onBubbleMove,
   onBubbleRemove,
 }: Props) {
+  const kid = useIsKidcore();
   const stripRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef<DragTarget | null>(null);
   const offsetRef = useRef({ x: 0, y: 0 });
@@ -92,7 +95,10 @@ export default function PhotostripPreview({
         flexDirection: "column",
         gap: STRIP.GAP,
         overflow: "hidden",
-        boxShadow: "0 12px 32px rgba(0,0,0,0.11), 0 4px 10px rgba(0,0,0,0.07)",
+        // kidcore: ink outline + hard shadow drawn outside so photo layout is unchanged
+        boxShadow: kid
+          ? `0 0 0 3px ${INK}, 6px 7px 0 3px ${INK}`
+          : "0 12px 32px rgba(0,0,0,0.11), 0 4px 10px rgba(0,0,0,0.07)",
         boxSizing: "border-box",
       }}
     >
@@ -106,6 +112,7 @@ export default function PhotostripPreview({
             borderRadius: 6,
             overflow: "hidden",
             flexShrink: 0,
+            ...(kid ? { outline: `2px solid ${INK}`, outlineOffset: -2 } : null),
           }}
         >
           <img
@@ -130,6 +137,7 @@ export default function PhotostripPreview({
             userSelect: "none",
             touchAction: "none",
             lineHeight: 1,
+            display: "flex",
           }}
           initial={{ scale: 0, rotate: -15 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -145,7 +153,7 @@ export default function PhotostripPreview({
           onDoubleClick={() => onStickerRemove(sticker.id)}
           title="Drag to move · Double-click to remove"
         >
-          {sticker.emoji}
+          <StickerGlyph id={sticker.emoji} size={28 * sticker.scale} />
         </motion.div>
       ))}
 
@@ -182,11 +190,11 @@ export default function PhotostripPreview({
               background: "#ffffff",
               borderRadius: 8,
               padding: "5px 9px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              boxShadow: kid ? `0 0 0 1px ${INK}, 2px 2px 0 1px ${INK}` : "0 2px 8px rgba(0,0,0,0.15)",
               fontSize: 11,
-              fontFamily: "'Inter', sans-serif",
-              color: "#2F2F2F",
-              fontWeight: 400,
+              fontFamily: kid ? "'Nunito', sans-serif" : "'Inter', sans-serif",
+              color: kid ? INK : "#2F2F2F",
+              fontWeight: kid ? 700 : 400,
               whiteSpace: "nowrap",
               maxWidth: 140,
               overflow: "hidden",
@@ -208,7 +216,9 @@ export default function PhotostripPreview({
                 borderLeft: "5px solid transparent",
                 borderRight: "5px solid transparent",
                 borderTop: "6px solid #ffffff",
-                filter: "drop-shadow(0 2px 1px rgba(0,0,0,0.10))",
+                filter: kid
+                  ? `drop-shadow(0 1.5px 0 ${INK}) drop-shadow(1px 0 0 ${INK}) drop-shadow(-1px 0 0 ${INK})`
+                  : "drop-shadow(0 2px 1px rgba(0,0,0,0.10))",
               }}
             />
           </div>
